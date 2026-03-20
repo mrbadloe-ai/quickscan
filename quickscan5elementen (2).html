@@ -1,0 +1,419 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<div id="qs-root">
+<style>
+#qs-root{font-family:'Segoe UI',Tahoma,sans-serif;color:#2d2d2d;max-width:680px;margin:0 auto;padding:0 16px 60px}
+#qs-root *{box-sizing:border-box}
+#qs-root h1,#qs-root h2,#qs-root h3,#qs-root p,#qs-root ul{margin:0;padding:0}
+#qs-root .hero{color:#fff;text-align:center;padding:40px 24px 44px;border-radius:20px;margin-bottom:24px}
+#qs-root .hero h1{font-size:1.6rem;font-weight:800;margin-bottom:6px;color:#fff}
+#qs-root .hero p{opacity:.9;font-size:.9rem;line-height:1.5;color:#fff}
+#qs-root .card{background:#fff;border-radius:18px;padding:22px;margin-bottom:14px;box-shadow:0 2px 16px rgba(0,0,0,.07)}
+#qs-root .lbl{font-size:.8rem;font-weight:700;color:#888;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px;display:block}
+#qs-root input[type=text],#qs-root input[type=email]{width:100%;padding:11px 15px;border:2px solid #e8dff5;border-radius:11px;font-size:1rem;outline:none;transition:border-color .2s;background:#fff;color:#2d2d2d}
+#qs-root input:focus{border-color:#9B5DE5}
+#qs-root .qs-btn{display:block;width:100%;padding:14px;border-radius:50px;border:none;color:#fff;font-size:.95rem;font-weight:700;cursor:pointer;transition:transform .15s,box-shadow .15s;letter-spacing:.3px;text-align:center;text-decoration:none}
+#qs-root .qs-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,0,0,.18)}
+#qs-root .qs-btn-ghost{background:transparent!important;border:2px solid #9B5DE5!important;color:#9B5DE5!important;box-shadow:none!important}
+#qs-root .prog-bar{height:6px;background:#e8dff5;border-radius:3px;margin-bottom:5px}
+#qs-root .prog-fill{height:100%;border-radius:3px;transition:width .4s ease}
+#qs-root .prog-txt{font-size:.75rem;color:#bbb;text-align:right;margin-bottom:18px}
+#qs-root .ctx-box{background:#f8f4ff;border-radius:14px;padding:14px 18px;margin-bottom:14px;font-size:.83rem;color:#666;line-height:1.65}
+#qs-root .q-card{background:#fff;border-radius:14px;padding:18px;margin-bottom:12px;box-shadow:0 1px 10px rgba(0,0,0,.06);border-left:4px solid transparent}
+#qs-root .q-card.err{border-left-color:#E84855}
+#qs-root .q-txt{font-size:.9rem;color:#333;line-height:1.55;margin-bottom:14px;font-weight:600}
+#qs-root .q-row{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+#qs-root .row-lbl{font-size:.75rem;color:#888;min-width:90px;line-height:1.3}
+#qs-root .btn-grp{display:flex;gap:6px;flex:1}
+#qs-root .rb{flex:1;height:36px;border-radius:8px;border:2px solid #e0d8f0;background:#fafafa;cursor:pointer;font-size:.9rem;font-weight:700;color:#aaa;transition:all .15s}
+#qs-root .rb:hover{color:var(--ec);border-color:var(--ec)}
+#qs-root .rb.act{background:var(--ec);border-color:var(--ec);color:#fff}
+#qs-root .scale-lbl{display:flex;justify-content:space-between;font-size:.7rem;color:#ccc;margin-top:2px;padding-left:100px}
+#qs-root .loading{text-align:center;padding:80px 20px}
+#qs-root .spinner{width:52px;height:52px;border:5px solid #e8dff5;border-top-color:#9B5DE5;border-radius:50%;animation:qs-spin 1s linear infinite;margin:0 auto 22px}
+@keyframes qs-spin{to{transform:rotate(360deg)}}
+#qs-root .domain-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 14px;border-radius:20px;font-size:.8rem;font-weight:700;color:#fff;margin-bottom:12px}
+#qs-root .chart-wrap{position:relative;height:260px;margin:6px 0 14px}
+#qs-root .report-box{font-size:.88rem;line-height:1.85;color:#444;background:#f8f4ff;border-radius:12px;padding:16px 18px}
+#qs-root .report-box p{margin-bottom:10px}
+#qs-root .report-box p:last-child{margin-bottom:0}
+#qs-root .legend{display:flex;gap:16px;justify-content:center;margin-bottom:6px;font-size:.78rem;color:#777}
+#qs-root .ldot{width:11px;height:11px;border-radius:50%;display:inline-block;margin-right:4px;vertical-align:middle}
+#qs-root .fin-card{background:linear-gradient(135deg,#9B5DE511,#3A86FF11);border:2px solid #9B5DE533;border-radius:18px;padding:22px;margin-bottom:14px}
+</style>
+<div id="qs-app"></div>
+<script>
+const ELS=[
+  {n:'Ether',e:'✨',c:'#9B5DE5'},
+  {n:'Lucht',e:'🌬️',c:'#E8A020'},
+  {n:'Vuur', e:'🔥',c:'#E84855'},
+  {n:'Water',e:'💧',c:'#3A86FF'},
+  {n:'Aarde',e:'🌿',c:'#5C9E31'}
+];
+const DOMS=[
+  {n:'Privé leven',e:'🏡',c:'#E84855',g:'linear-gradient(135deg,#E84855,#FF8C69)'},
+  {n:'Werk',e:'💼',c:'#3A86FF',g:'linear-gradient(135deg,#3A86FF,#56CCF2)'},
+  {n:'Persoonlijke Ontwikkeling',e:'🌱',c:'#9B5DE5',g:'linear-gradient(135deg,#9B5DE5,#C77DFF)'}
+];
+const DATA={
+  'Privé leven':{
+    'Ether':{sub:'ruimte',ctx:'Deze vragen gaan over het element <strong>Ether (ruimte)</strong> en hoe je dit ervaart in je privé leven. Denk aan je relatie, je gezin, vriendschappen en je sociale kring.',q:['Heb je voldoende tijd en ruimte om te reflecteren en je gedachten te ordenen?','Heb je voldoende ruimte om je gevoelens en verlangens te delen met je naasten?','Voel je je vrij om je authentieke zelf te zijn binnen je familie en sociale kring?','Hoe belangrijk zijn spirituele of filosofische overtuigingen in je dagelijks leven?']},
+    'Lucht':{sub:'beweging/verandering',ctx:'Deze vragen gaan over het element <strong>Lucht (beweging/verandering)</strong> en hoe je dit ervaart in je privé leven. Probeer zoveel mogelijk aan concrete situaties te denken.',q:['Hoe goed kun je omgaan met veranderingen in je persoonlijke leven?','Voel je dat je voldoende flexibiliteit hebt om je aan te passen aan nieuwe omstandigheden?','Voel je je vaak rusteloos en/of zoek je constant naar nieuwe prikkels?','Hoe belangrijk is je familie, gezin of partner voor jou in het leven?']},
+    'Vuur':{sub:'passie/motivatie',ctx:'Deze vragen gaan over het element <strong>Vuur (passie/motivatie)</strong> en hoe je dit ervaart in je privé leven. Let op het onderscheid tussen de realiteit nu en wat je ambieert.',q:['Ik voel energie en passie in mijn leven.','Ik kan mijn emoties goed herkennen en onderscheiden van elkaar.','Ik geef duidelijk mijn grenzen aan.','Ik voel me gemotiveerd om mijn doelen te bereiken.']},
+    'Water':{sub:'verbinding/cohesie',ctx:'Deze vragen gaan over het element <strong>Water (verbinding/cohesie)</strong> en hoe je dit ervaart in je privé leven.',q:['In de relaties met de belangrijkste mensen in mijn leven ervaar ik een diepe verbinding.','Ik kan goed omgaan met emoties zoals verdriet en teleurstelling.','Ik ben in staat om te vergeven en vergeten.','Ik kan mezelf kwetsbaar opstellen in relaties.']},
+    'Aarde':{sub:'stabiliteit/structuur',ctx:'Deze vragen gaan over het element <strong>Aarde (stabiliteit/structuur)</strong> en hoe je dit ervaart in je privé leven.',q:['Ik voel me veilig in mijn privé omgeving en situatie.','Mijn dagelijkse routine geeft me structuur en rust.','Tradities en rituelen spelen een belangrijke rol in mijn leven.','Mensen kunnen echt op mij rekenen, ik ben voor hen een rots in de branding.']}
+  },
+  'Werk':{
+    'Ether':{sub:'ruimte voor visie/innovatie',ctx:'Deze vragen gaan over het element <strong>Ether (ruimte voor visie/innovatie)</strong> en hoe je dit ervaart in jouw dagelijkse werk en de rol die je binnen jouw organisatie hebt.',q:['Ik heb voldoende tijd en ruimte om te reflecteren op wat ik doe en waarom.','Ik durf te dromen en mijn visie te delen met anderen.','Ik voel me vrij om mijn authentieke zelf te zijn bij mijn collega\'s.','Mijn leven heeft een diepere betekenis door het werk dat ik doe.']},
+    'Lucht':{sub:'beweging/verandering',ctx:'Deze vragen gaan over het element <strong>Lucht (beweging/verandering)</strong> en hoe je dit ervaart in je dagelijkse werk.',q:['Ik ga soepel om met veranderingen op het werk.','Ik ervaar vaak momenten van inspiratie en spontaniteit in mijn werk.','De mensen waarmee ik werk staan open voor verandering en creativiteit.','In mijn organisatie zien we verandering vooral als kansen en niet als een bedreiging.']},
+    'Vuur':{sub:'passie en leiderschap',ctx:'Deze vragen gaan over het element <strong>Vuur (passie en leiderschap)</strong> en hoe je dit ervaart in jouw dagelijkse werk.',q:['Ik voel me dagelijks gemotiveerd op het werk en wil vooral aan de slag.','Ik neem graag het voortouw bij projecten en beslissingen.','Ik voel me energiek en gedreven door de doelen van de organisatie.']},
+    'Water':{sub:'samenwerking en emotionele intelligentie',ctx:'Deze vragen gaan over het element <strong>Water (samenwerking en emotionele intelligentie)</strong> en hoe je dit ervaart in jouw dagelijkse werk.',q:['In mijn team kunnen we elkaar constructieve feedback geven en ontvangen zonder weerstand.','Ik voel me verbonden met mijn collega\'s en teamleden.','Ik toon empathie en houd rekening met de gevoelens van anderen.','Ik ga goed om met conflicten en andere samenwerkingsuitdagingen.']},
+    'Aarde':{sub:'stabiliteit en concrete resultaten',ctx:'Deze vragen gaan over het element <strong>Aarde (stabiliteit en concrete resultaten)</strong> en hoe je dit ervaart in jouw dagelijkse werk.',q:['Ik snap en ervaar regelmatig hoe mijn werk het werk van anderen in de organisatie ondersteunt.','Ik zie de resultaten van mijn werk en dat doet me goed.','Ik vind het belangrijker om iets af te krijgen in plaats van steeds aan iets nieuws te beginnen.','Ik kan mijn werk effectief plannen en structureren.','Ik ervaar mijn werkomgeving als betrouwbaar en voorspelbaar.']}
+  },
+  'Persoonlijke Ontwikkeling':{
+    'Ether':{sub:'bewustzijn en spirituele groei',ctx:'Deze vragen gaan over het element <strong>Ether (bewustzijn en spirituele groei)</strong> en hoe je dit ervaart als het gaat om jouw persoonlijke ontwikkeling.',q:['Ik zorg meestal voor een dagelijks moment voor reflectie of introspectie.','Ik voel me verbonden met iets groters dan mezelf.','Ik ben altijd nieuwsgierig naar nieuwe inzichten en wijsheid.','Ik ben me bewust van mijn eigen gedachten en overtuigingen: Ik weet waar ik voor sta.']},
+    'Lucht':{sub:'verandering en groei',ctx:'Deze vragen gaan over het element <strong>Lucht (verandering en groei)</strong> en hoe je dit ervaart als het gaat om jouw persoonlijke ontwikkeling.',q:['Ik heb geen moeite om oude gewoontes te doorbreken.','Ik heb de behoefte om steeds te blijven leren en ontwikkelen.','Ik leer liever verschillende dingen tegelijk dan me specifiek toe te leggen op 1 ding.','Ik voel de vrijheid en speelsheid om nieuwe ervaringen aan te gaan.']},
+    'Vuur':{sub:'energie en transformatie',ctx:'Deze vragen gaan over het element <strong>Vuur (energie en transformatie)</strong> en hoe je dit ervaart als het gaat om jouw persoonlijke ontwikkeling.',q:['Ik heb een duidelijke drijfveer om mezelf te blijven verbeteren.','Ik heb een duidelijk beeld van wat mijn groeiambities zijn en hoe die mij dichter bij mijn doelen brengen.','Ik kan dagelijkse zaken opzij zetten of opofferen voor mijn persoonlijke groei.','Uitdagingen op het pad van mijn persoonlijke groei zie ik eerder als kansen.']},
+    'Water':{sub:'emotionele groei en zelfacceptatie',ctx:'Deze vragen gaan over het element <strong>Water (emotionele groei en zelfacceptatie)</strong> en hoe je dit ervaart als het gaat om jouw persoonlijke ontwikkeling.',q:['Ik kan mijn gedachten goed ordenen en in verband brengen met wat er in mijn omgeving gebeurt.','Ik voel liefde en acceptatie voor wie en wat ik ben.','Hoe ik me voel van binnen uit zich ook in mijn gedrag, ik heb geen masker op.','Ik toon gemakkelijk liefde en compassie voor mezelf en anderen in mijn omgeving.']},
+    'Aarde':{sub:'manifestatie/structuur',ctx:'Deze vragen gaan over het element <strong>Aarde (manifestatie/structuur)</strong> en hoe je dit ervaart als het gaat om jouw persoonlijke ontwikkeling.',q:['Ik kan mijn ideeën goed omzetten in concrete acties.','Ik heb een duidelijke en gestructureerde aanpak voor mijn persoonlijke ontwikkeling.','Ik ben gedisciplineerd en consistent bij het realiseren van mijn persoonlijke groei: Als ik ergens aan begin, maak ik het af.','Mijn groeiambities zijn sterk geworteld in en passen bij wie ik ben en waar ik vandaan kom.']}
+  }
+};
+
+// Rapportage templates per element per disbalans-richting
+const TEKSTEN={
+  'Ether':{
+    tekort:{
+      priv:`Je ervaart duidelijk minder ruimte voor Ether — de kwaliteit van stilte, reflectie en authenticiteit — dan je zou willen in je privéleven. Misschien merk je dat je weinig tijd hebt om echt bij jezelf te zijn, of dat je je gevoelens en verlangens niet altijd kwijt kunt bij de mensen om je heen. Ether vraagt om ruimte tussen de drukte — niet als luxe, maar als noodzaak. <em>Wat zou er veranderen als je jezelf elke dag één moment van echte stilte zou gunnen?</em>`,
+      werk:`In je werk ervaar je minder Ether dan je verlangt. Je visie, je diepere betekenis en de vrijheid om je authentieke zelf te zijn lijken niet volledig tot hun recht te komen. Misschien voel je je gevangen in de waan van de dag, terwijl er zoveel meer in je zit. <em>Wanneer heb je voor het laatst de ruimte genomen om te dromen over wat jouw werk werkelijk zou kunnen betekenen?</em>`,
+      ontw:`Op het gebied van persoonlijke ontwikkeling zie je dat je jezelf minder Ether gunt dan je eigenlijk zou willen. Je bewustzijn en je spirituele groei vragen om aandacht — maar de stilte en reflectie die daarvoor nodig zijn, komen er misschien te weinig van. <em>Wat houdt je tegen om meer ruimte te maken voor je innerlijke groei?</em>`
+    },
+    overschot:{
+      priv:`Je ervaart meer Ether in je privéleven dan je eigenlijk wilt. Te veel ruimte kan zich uiten als een gevoel van afstand, onthechting of het missen van echte verbinding. Soms is teveel stilte ook een manier om je af te schermen. <em>Op welke manier zou je meer aanwezig kunnen zijn in de relaties die voor jou tellen?</em>`,
+      werk:`In je werk ervaart je meer Ether dan gewenst. Dit kan zich uiten als een gevoel van afstand tot je werk, gebrek aan verbinding met collega's of het idee dat je zweeft zonder voldoende houvast. <em>Wat zou je helpen om je meer gegrond en betrokken te voelen in je werk?</em>`,
+      ontw:`Je ervaart meer Ether in je persoonlijke ontwikkeling dan je zou willen. Veel reflectie zonder actie kan leiden tot een gevoel van stilstand. <em>Welke kleine, concrete stap zou je nu kunnen zetten om je inzichten in beweging te brengen?</em>`
+    },
+    balans:{
+      priv:`Ether — de kwaliteit van ruimte en authenticiteit — is in je privéleven redelijk in balans. Je ervaart voldoende stilte en verbinding met jezelf.`,
+      werk:`Ether is in je werk grotendeels in balans. Je hebt ruimte voor visie en voor het zijn wie je bent.`,
+      ontw:`Ether is in je persoonlijke ontwikkeling in balans. Je bewustzijn en je verbinding met iets groters voelen goed.`
+    }
+  },
+  'Lucht':{
+    tekort:{
+      priv:`In je privéleven wil je meer Lucht — meer beweging, flexibiliteit en speelsheid. Misschien voel je je soms vastzitten in patronen of routines die niet meer bij je passen. Lucht brengt frisheid en aanpassingsvermogen. <em>Waar zou jij in je privéleven meer ruimte kunnen maken voor onverwachte, luchtige momenten?</em>`,
+      werk:`Op het werk verlang je naar meer Lucht: meer inspiratie, spontaniteit en creatieve vrijheid. Je ervaart mogelijk een keurslijf van verwachtingen of routines. <em>Welke ene verandering zou jouw werkdag meer leven en beweging inblazen?</em>`,
+      ontw:`In je persoonlijke ontwikkeling wil je meer Lucht — meer beweging, meer leren, meer doorbreken van oude patronen. <em>Welke gewoonte of overtuiging is al lang aan vervanging toe?</em>`
+    },
+    overschot:{
+      priv:`Je ervaart meer Lucht in je privéleven dan je wilt. Veel beweging, sociale activiteit of verandering kan uitputtend zijn als je er niet volledig voor kiest. Misschien mis je diepgang of echte rust. <em>Waar verlang je naar meer stabiliteit en echte verbinding?</em>`,
+      werk:`Er is meer Lucht op het werk dan je wenst. Veel verandering, prikkels of creativiteit zonder houvast kan leiden tot versnippering. <em>Wat zou je helpen om meer focus en consistentie te vinden?</em>`,
+      ontw:`Je ervaart meer Lucht in je ontwikkeling dan gewenst — je leert veel, maar misschien te verspreid. <em>Wat zou er gebeuren als je je voor langere tijd zou toeleggen op één richting?</em>`
+    },
+    balans:{
+      priv:`Lucht is in je privéleven in balans. Je gaat goed om met verandering en vindt voldoende flexibiliteit in je dagelijks leven.`,
+      werk:`Lucht is op het werk in balans. Er is voldoende ruimte voor creativiteit en aanpassingsvermogen.`,
+      ontw:`Lucht is in je ontwikkeling in balans. Je leert en groeit in een prettig ritme.`
+    }
+  },
+  'Vuur':{
+    tekort:{
+      priv:`In je privéleven wil je meer Vuur — meer passie, energie en motivatie. Misschien voel je je soms mat of mis je het vonkje dat je doet opleven. Vuur is de kracht die je in beweging zet en je laat voelen dat je leeft. <em>Wanneer heb je voor het laatst echt brandende passie gevoeld — en wat bracht dat teweeg?</em>`,
+      werk:`Op het werk verlang je naar meer Vuur: meer motivatie, gedrevenheid en leiderschapskracht. Je wilt je energieker voelen en meer het voortouw nemen. <em>Wat zou jou dagelijks aansteken om met meer vuur aan de slag te gaan?</em>`,
+      ontw:`In je persoonlijke ontwikkeling wil je meer Vuur — een sterkere drijfveer, meer richting en de bereidheid om offers te brengen voor je groei. <em>Wat is de diepste reden waarom jij wilt groeien — en hoe levend voelt die reden nu?</em>`
+    },
+    overschot:{
+      priv:`Je ervaart meer Vuur in je privéleven dan je wenst. Te veel passie of gedrevenheid kan zich uiten als ongeduld, controledrang of uitputting. <em>Hoe kun je jouw vuur bewust temmen om ook ruimte te geven aan anderen?</em>`,
+      werk:`Er is meer Vuur op het werk dan gewenst. Je kunt te gedreven zijn, waardoor je over grenzen gaat — van jezelf of van anderen. <em>Hoe zorg je dat jouw vuur warm geeft zonder te verbranden?</em>`,
+      ontw:`Je ervaart meer Vuur in je ontwikkeling dan je wilt. Veel ambitie zonder rust kan leiden tot een gevoel van nooit goed genoeg. <em>Hoe leer je genieten van wie je nu al bent?</em>`
+    },
+    balans:{
+      priv:`Vuur is in je privéleven in balans. Je voelt voldoende energie en motivatie in je dagelijks leven.`,
+      werk:`Vuur is op het werk in balans. Je motivatie en gedrevenheid zijn aanwezig zonder dat ze je overweldigen.`,
+      ontw:`Vuur is in je persoonlijke ontwikkeling in balans. Je hebt een heldere drijfveer en de energie om te groeien.`
+    }
+  },
+  'Water':{
+    tekort:{
+      priv:`In je privéleven wil je meer Water — diepere verbinding, meer emotionele openheid en het vermogen om te vergeven en te stromen. Misschien voel je je soms afgeschermd of mis je echte intimiteit. <em>Waar zou je je kwetsbaarder mogen opstellen om meer echte verbinding toe te laten?</em>`,
+      werk:`Op het werk verlang je naar meer Water: meer verbinding met collega's, meer empathie en een betere samenwerking. <em>Hoe zou jij de sfeer in jouw team kunnen verdiepen?</em>`,
+      ontw:`In je persoonlijke ontwikkeling wil je meer Water — meer zelfacceptatie, liefde voor jezelf en emotionele helderheid. <em>Hoe zou je vriendelijker voor jezelf kunnen zijn op het pad van je groei?</em>`
+    },
+    overschot:{
+      priv:`Er is meer Water in je privéleven dan je wilt. Te veel meegaan met emoties of de behoeften van anderen kan leiden tot zelfverlies. <em>Hoe zorg je dat je verbonden blijft met anderen zónder jezelf te verliezen?</em>`,
+      werk:`Je ervaart meer Water op het werk dan gewenst. Empathie is een kracht, maar als je te veel meegaat in andermans emoties, verlies je je eigen richting. <em>Hoe kun je betrokken blijven zonder overbelast te raken?</em>`,
+      ontw:`Er is meer Water in je ontwikkeling dan je wenst. Veel zelfreflectie en emotionele verwerking is waardevol, maar kan ook verlammend werken. <em>Op welk punt mag je je inzichten loslaten en gewoon handelen?</em>`
+    },
+    balans:{
+      priv:`Water is in je privéleven in balans. Je ervaart verbinding en emotionele openheid in de mate die bij je past.`,
+      werk:`Water is op het werk in balans. Samenwerking en empathie komen goed tot hun recht.`,
+      ontw:`Water is in je persoonlijke ontwikkeling in balans. Je verhouding tot je emoties en zelfacceptatie voelt gezond.`
+    }
+  },
+  'Aarde':{
+    tekort:{
+      priv:`In je privéleven wil je meer Aarde — meer stabiliteit, structuur en het gevoel van veiligheid. Misschien voel je de grond onder je voeten soms wat wankel. Aarde geeft houvast. <em>Wat zou jou in je privéleven meer geworteld en veilig laten voelen?</em>`,
+      werk:`Op het werk verlang je naar meer Aarde: meer structuur, voorspelbaarheid en het zien van concrete resultaten. <em>Welke structuur of routine zou jou op het werk meer rust en stevigheid geven?</em>`,
+      ontw:`In je persoonlijke ontwikkeling wil je meer Aarde — een concretere aanpak, meer discipline en groeiambities die geworteld zijn in wie je bent. <em>Hoe maak jij van jouw groeiplannen iets tastbaars in het dagelijks leven?</em>`
+    },
+    overschot:{
+      priv:`Je ervaart meer Aarde in je privéleven dan je zou willen. Te veel structuur of routine kan leiden tot een gevoel van vastzitten. <em>Waar mag jij de vaste grond loslaten en iets nieuws toelaten?</em>`,
+      werk:`Er is meer Aarde op het werk dan gewenst. Veel stabiliteit en voorspelbaarheid kan prettig zijn, maar ook remmen. <em>Wat zou er gebeuren als je één vaste gewoonte op het werk losliet?</em>`,
+      ontw:`Je ervaart meer Aarde in je persoonlijke ontwikkeling dan je wilt. Een stevige basis is mooi, maar te veel vasthouden aan structuur kan groei in de weg zitten. <em>Welk nieuw pad durf jij in te slaan, ook al is het onbekend terrein?</em>`
+    },
+    balans:{
+      priv:`Aarde is in je privéleven in balans. Je ervaart voldoende stabiliteit en veiligheid om vanuit te leven.`,
+      werk:`Aarde is op het werk in balans. Structuur en resultaatgerichtheid zijn aanwezig in de juiste maat.`,
+      ontw:`Aarde is in je persoonlijke ontwikkeling in balans. Je groei is goed geworteld en je aanpak is concreet.`
+    }
+  }
+};
+
+const SECTIONS=[];
+DOMS.forEach((d,di)=>ELS.forEach((e,ei)=>SECTIONS.push({di,ei,dom:d.n,el:e.n})));
+
+let S={screen:'welcome',naam:'',email:'',section:0,answers:{},scores:null};
+let charts=[];
+
+function initAnswers(){
+  DOMS.forEach(d=>{S.answers[d.n]={};ELS.forEach(e=>{S.answers[d.n][e.n]=DATA[d.n][e.n].q.map(()=>({nu:0,gewenst:0}));});});
+}
+initAnswers();
+
+(function(){
+const app=document.getElementById('qs-app');
+
+function render(){
+  charts.forEach(c=>c.destroy());charts=[];
+  if(S.screen==='welcome')renderWelcome();
+  else if(S.screen==='section')renderSection();
+  else if(S.screen==='loading')renderLoading();
+  else if(S.screen==='results')renderResults();
+}
+
+function renderWelcome(){
+  app.innerHTML=`
+  <div class="hero" style="background:linear-gradient(135deg,#9B5DE5,#3A86FF)">
+    <div style="font-size:2.8rem;margin-bottom:10px">🌿✨</div>
+    <h1>QuickScan 5 Elementen</h1>
+    <p>Leiderschap op basis van de Ayurvedische 5 Elementenleer</p>
+  </div>
+  <div class="card">
+    <p style="color:#555;line-height:1.7;font-size:.9rem;margin-bottom:20px">
+      Dit formulier helpt je inzicht te krijgen in de balans tussen de 5 elementen (<em>ether, lucht, vuur, water en aarde</em>) binnen de domeinen privé, werk en persoonlijke ontwikkeling.<br><br>
+      Je beantwoordt elke vraag tweemaal:<br>
+      <strong>• Voor je huidige situatie</strong> (zoals het nu is)<br>
+      <strong>• Voor de door jou gewenste situatie</strong> (jouw ideaal)<br><br>
+      <strong>1</strong> = Helemaal niet van toepassing &nbsp;·&nbsp; <strong>5</strong> = Volledig van toepassing
+    </p>
+    <div style="margin-bottom:14px">
+      <label class="lbl">Jouw naam *</label>
+      <input type="text" id="inp-naam" placeholder="Bijv. Anna" value="${S.naam}">
+    </div>
+    <div>
+      <label class="lbl">E-mailadres *</label>
+      <input type="email" id="inp-email" placeholder="jouw@email.nl" value="${S.email}">
+    </div>
+    <button class="qs-btn" style="background:linear-gradient(135deg,#9B5DE5,#3A86FF);margin-top:18px" onclick="startScan()">Start de scan →</button>
+    <button class="qs-btn qs-btn-ghost" style="margin-top:10px" onclick="testScan()">🧪 Testmodus – sla vragen over</button>
+  </div>`;
+}
+
+function startScan(){
+  const n=document.getElementById('inp-naam').value.trim();
+  const em=document.getElementById('inp-email').value.trim();
+  if(!n){alert('Vul je naam in 😊');return;}
+  if(!em||!em.includes('@')){alert('Vul een geldig e-mailadres in');return;}
+  S.naam=n;S.email=em;S.section=0;S.screen='section';render();
+})();window.scrollTo(0,0);
+}
+
+function testScan(){
+  const n=document.getElementById('inp-naam').value.trim()||'Monique';
+  const em=document.getElementById('inp-email').value.trim()||'test@test.nl';
+  S.naam=n;S.email=em;
+  DOMS.forEach(d=>ELS.forEach(e=>{
+    S.answers[d.n][e.n]=DATA[d.n][e.n].q.map(()=>({nu:Math.ceil(Math.random()*4),gewenst:Math.ceil(Math.random()*5)}));
+  }));
+  S.screen='loading';render();
+  setTimeout(()=>{S.scores=calcScores();S.screen='results';render();window.scrollTo(0,0);},1800);
+}
+
+function renderSection(){
+  const{di,ei,dom,el}=SECTIONS[S.section];
+  const d=DOMS[di],e=ELS[ei],info=DATA[dom][el],ans=S.answers[dom][el];
+  const pct=Math.round((S.section/15)*100);
+  const qHtml=info.q.map((q,qi)=>`
+    <div class="q-card" id="qc${qi}" style="--ec:${e.c}">
+      <p class="q-txt">${qi+1}. ${q}</p>
+      <div class="q-row">
+        <span class="row-lbl">Zoals het nu is</span>
+        <div class="btn-grp">
+          ${[1,2,3,4,5].map(v=>`<button class="rb${ans[qi].nu===v?' act':''}" style="--ec:${e.c}" onclick="setA(${di},${ei},${qi},'nu',${v})">${v}</button>`).join('')}
+        </div>
+      </div>
+      <div class="scale-lbl"><span>niet van toepassing</span><span>volledig</span></div>
+      <div class="q-row" style="margin-top:10px">
+        <span class="row-lbl">Zoals je het graag zou willen</span>
+        <div class="btn-grp">
+          ${[1,2,3,4,5].map(v=>`<button class="rb${ans[qi].gewenst===v?' act':''}" style="--ec:${e.c}" onclick="setA(${di},${ei},${qi},'gewenst',${v})">${v}</button>`).join('')}
+        </div>
+      </div>
+      <div class="scale-lbl"><span>niet van toepassing</span><span>volledig</span></div>
+    </div>`).join('');
+  app.innerHTML=`
+  <div class="hero" style="background:${d.g}">
+    <div style="font-size:2rem;margin-bottom:6px">${e.e} ${d.e}</div>
+    <h1 style="font-size:1.35rem">${e.n} <span style="opacity:.8;font-weight:400">· ${dom}</span></h1>
+    <p style="font-size:.82rem;opacity:.85">${e.n} (${info.sub}) · Sectie ${S.section+1} van 15</p>
+  </div>
+  <div>
+    <div class="prog-bar"><div class="prog-fill" style="width:${pct}%;background:${d.c}"></div></div>
+    <div class="prog-txt">${pct}% voltooid</div>
+  </div>
+  <div class="ctx-box" style="border-left:4px solid ${e.c}">${info.ctx}</div>
+  ${qHtml}
+  <div id="verr" style="display:none;color:#E84855;background:#fff0f1;border-radius:10px;padding:10px 14px;font-size:.84rem;margin:8px 0">
+    ⚠️ Beantwoord alle vragen (beide rijen) voordat je verdergaat.
+  </div>
+  <div style="display:flex;gap:10px;margin-top:10px">
+    ${S.section>0?`<button class="qs-btn qs-btn-ghost" onclick="prevSec()" style="flex:0 0 90px">← Terug</button>`:''}
+    <button class="qs-btn" style="background:${d.g};flex:1" onclick="nextSec()">
+      ${S.section===14?'Genereer mijn rapport ✨':'Volgende →'}
+    </button>
+  </div>`;
+}
+
+function setA(di,ei,qi,type,val){
+  const dom=DOMS[di].n,el=ELS[ei].n;
+  S.answers[dom][el][qi][type]=val;
+  const allBtns=document.querySelectorAll(`#qc${qi} .btn-grp`);
+  const rowIdx=type==='nu'?0:1;
+  allBtns[rowIdx]?.querySelectorAll('.rb').forEach((b,i)=>b.classList.toggle('act',i+1===val));
+  document.getElementById(`qc${qi}`)?.classList.remove('err');
+}
+
+function nextSec(){
+  const{di,ei,dom,el}=SECTIONS[S.section];
+  const ans=S.answers[dom][el];
+  const bad=ans.map((a,i)=>a.nu===0||a.gewenst===0?i:-1).filter(i=>i>=0);
+  if(bad.length){
+    document.getElementById('verr').style.display='block';
+    bad.forEach(qi=>document.getElementById(`qc${qi}`)?.classList.add('err'));
+    return;
+  }
+  if(S.section<14){S.section++;render();window.scrollTo(0,0);}
+  else{
+    S.scores=calcScores();S.screen='loading';render();
+    setTimeout(()=>{S.screen='results';render();window.scrollTo(0,0);},1800);
+  }
+}
+
+function prevSec(){if(S.section>0){S.section--;render();window.scrollTo(0,0);}}
+
+function renderLoading(){
+  app.innerHTML=`
+  <div class="loading">
+    <div style="font-size:3.5rem;margin-bottom:18px">🌿</div>
+    <div class="spinner"></div>
+    <h2 style="margin-bottom:10px;font-size:1.2rem">Jouw profiel wordt samengesteld…</h2>
+    <p style="color:#aaa;font-size:.88rem">De 5 Elementen worden geanalyseerd…</p>
+  </div>`;
+}
+
+function calcScores(){
+  const sc={};
+  DOMS.forEach(d=>{sc[d.n]={};ELS.forEach(e=>{
+    const a=S.answers[d.n][e.n];
+    sc[d.n][e.n]={
+      nu:Math.round(a.reduce((s,x)=>s+x.nu,0)/a.length*10)/10,
+      gewenst:Math.round(a.reduce((s,x)=>s+x.gewenst,0)/a.length*10)/10
+    };
+  });});
+  return sc;
+}
+
+function getTekst(el,dom,sc){
+  const diff=sc.gewenst-sc.nu;
+  const domKey=dom==='Privé leven'?'priv':dom==='Werk'?'werk':'ontw';
+  let richting;
+  if(diff>=0.5)richting='tekort';
+  else if(diff<=-0.5)richting='overschot';
+  else richting='balans';
+  return TEKSTEN[el][richting][domKey];
+}
+
+function buildReport(naam,sc){
+  // Vind grootste disbalansen
+  const diffs=[];
+  DOMS.forEach(d=>ELS.forEach(e=>{
+    const s=sc[d.n][e.n];
+    diffs.push({dom:d.n,el:e.n,diff:Math.abs(s.gewenst-s.nu)});
+  }));
+  diffs.sort((a,b)=>b.diff-a.diff);
+  const top=diffs[0];
+
+  const intro=`${naam}, jouw profiel laat een interessant en herkenbaar patroon zien — een mix van bewustzijn, potentieel en plekken waar groei op je wacht. De scan brengt zichtbaar waar de elementen voor jou in balans zijn én waar je meer of minder van wilt ervaren. Wat in eerste instantie als een neutrale meting klinkt, vertelt eigenlijk een dieper verhaal over wat jij nodig hebt om vanuit jouw kracht te leven en te leiden. De grootste beweging zie je bij het element ${top.el} in je ${top.dom} — een uitnodiging om daar eens goed bij stil te staan.`;
+
+  const afsluiting=`Deze scan is een beginpunt, geen eindoordeel. De inzichten die hier naar boven komen, zijn een uitnodiging om op onderzoek te gaan — naar wat jou drijft, wat jou belemmert en wat er mogelijk wordt als je jouw volledige potentieel gaat claimen. Jij hebt alles in huis om vanuit balans en kracht leiding te geven — aan anderen én aan jezelf.`;
+
+  return{intro,afsluiting};
+}
+
+function renderResults(){
+  const sc=S.scores||calcScores();
+  const{intro,afsluiting}=buildReport(S.naam,sc);
+  const dk=['Privé leven','Werk','Persoonlijke Ontwikkeling'];
+  const domClr=['#E84855','#3A86FF','#9B5DE5'];
+
+  app.innerHTML=`
+  <div class="hero" style="background:linear-gradient(135deg,#9B5DE5,#3A86FF)">
+    <div style="font-size:2.8rem;margin-bottom:8px">✨</div>
+    <h1>Jouw Persoonlijk Profiel</h1>
+    <p>Leiderschap op basis van de 5 Elementen</p>
+  </div>
+
+  <div class="card">
+    <h2 style="color:#9B5DE5;margin-bottom:10px;font-size:1.05rem">🌿 Jouw profiel, ${S.naam}</h2>
+    <p style="line-height:1.8;color:#444;font-size:.9rem">${intro}</p>
+  </div>
+
+  ${DOMS.map((dom,i)=>{
+    const elTeksten=ELS.map(e=>`<p><strong style="color:${e.c}">${e.e} ${e.n}:</strong> ${getTekst(e.n,dom.n,sc[dom.n][e.n])}</p>`).join('');
+    return`<div class="card">
+      <span class="domain-badge" style="background:${dom.g}">${dom.e} ${dom.n}</span>
+      <div class="legend">
+        <span><span class="ldot" style="background:${dom.c}"></span>Huidig</span>
+        <span><span class="ldot" style="background:${dom.c}44;border:2px dashed ${dom.c}66"></span>Gewenst</span>
+      </div>
+      <div class="chart-wrap"><canvas id="ch${i}"></canvas></div>
+      <div class="report-box" style="border-left-color:${dom.c}">${elTeksten}</div>
+    </div>`;
+  }).join('')}
+
+  <div class="fin-card">
+    <h3 style="color:#9B5DE5;margin-bottom:10px">🌟 Jouw volgende stap</h3>
+    <p style="line-height:1.8;color:#444;font-size:.9rem">${afsluiting}</p>
+  </div>
+
+  <button class="qs-btn qs-btn-ghost" onclick="reset()" style="margin-top:4px">↩ Nieuwe scan starten</button>`;
+
+  setTimeout(()=>{
+    DOMS.forEach((dom,i)=>{
+      const cv=document.getElementById(`ch${i}`);if(!cv)return;
+      charts.push(new Chart(cv,{type:'radar',data:{
+        labels:ELS.map(e=>`${e.e} ${e.n}`),
+        datasets:[
+          {label:'Huidig',data:ELS.map(e=>sc[dom.n][e.n].nu),backgroundColor:`${dom.c}22`,borderColor:dom.c,borderWidth:2.5,pointBackgroundColor:dom.c,pointRadius:5},
+          {label:'Gewenst',data:ELS.map(e=>sc[dom.n][e.n].gewenst),backgroundColor:`${dom.c}0d`,borderColor:`${dom.c}99`,borderWidth:2,borderDash:[5,4],pointBackgroundColor:`${dom.c}99`,pointRadius:4}
+        ]
+      },options:{responsive:true,maintainAspectRatio:false,scales:{r:{min:0,max:5,ticks:{stepSize:1,display:false},grid:{color:'#e0d8f0'},pointLabels:{font:{size:11,weight:'600'},color:'#555'}}},plugins:{legend:{display:false}}}}));
+    });
+  },100);
+}
+
+function reset(){
+  S={screen:'welcome',naam:'',email:'',section:0,answers:{},scores:null};
+  initAnswers();render();window.scrollTo(0,0);
+}
+
+render();
+</script>
